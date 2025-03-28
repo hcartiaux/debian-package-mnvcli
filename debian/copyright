@@ -1,0 +1,8 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Source: https://www.dell.com/support/manuals/en-us/boss-s-1/boss-n1_ug/boss-n1-cli-commands-supported-on-poweredge-servers?guid=guid-cc571bf6-65c3-4b72-bb65-8f873ea74de2
+Upstream-Name: mnvcli
+Upstream-Contact: Dell, Inc.
+
+Files: *
+Copyright: Dell, Inc.
+License: Unknown

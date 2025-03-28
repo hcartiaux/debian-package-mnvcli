@@ -1,0 +1,14 @@
+Source: mnvcli
+Section: utils
+Priority: optional
+Maintainer: Hyacinthe Cartiaux <hyacinthe.cartiaux@uni.lu>
+Standards-Version: 4.7.2
+Homepage: https://www.dell.com/support/manuals/en-us/boss-s-1/boss-n1_ug/boss-n1-cli-commands-supported-on-poweredge-servers?guid=guid-cc571bf6-65c3-4b72-bb65-8f873ea74de2
+
+Package: mnvcli
+Architecture: amd64
+Depends: ${shlibs:Depends}
+Description: MNVCLI BOSS-N1 Utility for Linux
+ Provides the mnv_cli command, to manage Dell BOSS-N1 controllers,
+ flash firmware, display information of controllers, virtual
+ disks, physical disks...

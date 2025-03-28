@@ -1,0 +1,7 @@
+*.zip
+*.txt
+mnv_cli
+debian/files
+debian/mnvcli*
+debian/upstream
+debian/.debhelper/
