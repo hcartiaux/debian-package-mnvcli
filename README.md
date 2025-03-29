@@ -1,3 +1,39 @@
+# `MNVCLI` debian package
+
+`MNVCLI` is a tool to query and manipulate BOSS-N1 raid controllers found in Dell servers.
+It is distributed as a binary in a ZIP file on the Dell website.
+
+It is documented partially [in this manual](https://www.dell.com/support/manuals/en-us/boss-s-1/boss-n1_ug/boss-n1-cli-commands-supported-on-poweredge-servers?guid=guid-cc571bf6-65c3-4b72-bb65-8f873ea74de2).
+
+## Usage example
+
+```
+./mnv_cli info -o vd
+
+VD ID:               0
+Name:                VD_0
+Status:              Functional
+Importable:          No
+RAID Mode:           RAID1
+size:                447 GB
+PD Count:            2
+PDs:                 0 1
+Stripe Block Size:   128K
+Sector Size:         512 bytes
+VD is secure:        No
+
+Total # of VD:       1
+```
+
+## Update
+
+1. Find the new version URL on dell.com, [in example here](https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=ggx26)
+2. Update the URL of the application and release notes in the Makefile
+3. Update the sha256sums
+4. Add an entry in the `changelog` with the command `dch -i changelog`
+
+## Make
+
 ```
 $ make deb
 # Build the package
@@ -7,86 +43,7 @@ dpkg-buildpackage: info: source version 1.0.13.1061-1
 dpkg-buildpackage: info: source distribution unstable
 dpkg-buildpackage: info: source changed by Hyacinthe Cartiaux <hyacinthe.cartiaux@uni.lu>
 dpkg-buildpackage: info: host architecture amd64
- dpkg-source --before-build .
- fakeroot debian/rules clean
-make[1]: Entering directory '/home/hcartiaux/debian-package-mnvcli'
-dh clean --max-parallel=1
-   dh_auto_clean -O--max-parallel=1
-   dh_autoreconf_clean -O--max-parallel=1
-   dh_clean -O--max-parallel=1
-make[1]: Leaving directory '/home/hcartiaux/debian-package-mnvcli'
- debian/rules build
-make[1]: Entering directory '/home/hcartiaux/debian-package-mnvcli'
-dh build --max-parallel=1
-   dh_update_autotools_config -O--max-parallel=1
-   dh_autoreconf -O--max-parallel=1
-   dh_auto_configure -O--max-parallel=1
-   dh_auto_build -O--max-parallel=1
-        make -j1
-make[2]: Entering directory '/home/hcartiaux/debian-package-mnvcli'
-# Taken from https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=ggx26
-wget --user-agent="firefox" "https://dl.dell.com/FOLDER12268461M/1/BOSS-ROR-N1_Linux_CLI_1.0.13.1061_A03.zip"
-wget --user-agent="firefox" "https://dl.dell.com/FOLDER12593000M/1/BOSS-ROR-N1_Linux_RelNotes_1.0.13.1061_A03.txt"
-sha256sum -c sha256sums
---2025-03-28 19:26:48--  https://dl.dell.com/FOLDER12268461M/1/BOSS-ROR-N1_Linux_CLI_1.0.13.1061_A03.zip
-Resolving dl.dell.com (dl.dell.com)... 23.200.87.216, 23.200.87.187, 2a02:26f0:82::17d2:f951, ...
-Connecting to dl.dell.com (dl.dell.com)|23.200.87.216|:443... connected.
-HTTP request sent, awaiting response... 200 OK
-Length: 824554 (805K) [application/zip]
-Saving to: ‘BOSS-ROR-N1_Linux_CLI_1.0.13.1061_A03.zip’
-
-BOSS-ROR-N1_Linux_CLI_1.0.13.1061_A03.zip            100%[=====================================================================================================================>] 805.23K  4.02MB/s    in 0.2s    
-
-2025-03-28 19:26:48 (4.02 MB/s) - ‘BOSS-ROR-N1_Linux_CLI_1.0.13.1061_A03.zip’ saved [824554/824554]
-
---2025-03-28 19:26:48--  https://dl.dell.com/FOLDER12593000M/1/BOSS-ROR-N1_Linux_RelNotes_1.0.13.1061_A03.txt
-Resolving dl.dell.com (dl.dell.com)... 23.200.87.216, 23.200.87.187, 2a02:26f0:82::17d2:f951, ...
-Connecting to dl.dell.com (dl.dell.com)|23.200.87.216|:443... connected.
-HTTP request sent, awaiting response... 200 OK
-Length: 651 [text/plain]
-Saving to: ‘BOSS-ROR-N1_Linux_RelNotes_1.0.13.1061_A03.txt’
-
-BOSS-ROR-N1_Linux_RelNotes_1.0.13.1061_A03.txt       100%[=====================================================================================================================>]     651  --.-KB/s    in 0s      
-
-2025-03-28 19:26:48 (35.2 MB/s) - ‘BOSS-ROR-N1_Linux_RelNotes_1.0.13.1061_A03.txt’ saved [651/651]
-
-BOSS-ROR-N1_Linux_CLI_1.0.13.1061_A03.zip: OK
-BOSS-ROR-N1_Linux_RelNotes_1.0.13.1061_A03.txt: OK
-# Unzip and move files
-unzip -f *.zip
-rm -f *.zip
-mkdir -p debian/upstream
-mv -f *.txt debian/upstream/README
-Archive:  BOSS-ROR-N1_Linux_CLI_1.0.13.1061_A03.zip
-make[2]: Leaving directory '/home/hcartiaux/debian-package-mnvcli'
-   dh_auto_test -O--max-parallel=1
-   create-stamp debian/debhelper-build-stamp
-make[1]: Leaving directory '/home/hcartiaux/debian-package-mnvcli'
- fakeroot debian/rules binary
-make[1]: Entering directory '/home/hcartiaux/debian-package-mnvcli'
-dh binary --max-parallel=1
-   dh_testroot -O--max-parallel=1
-   dh_prep -O--max-parallel=1
-   dh_auto_install -O--max-parallel=1
-   dh_install -O--max-parallel=1
-   dh_installdocs -O--max-parallel=1
-   dh_installchangelogs -O--max-parallel=1
-   dh_systemd_enable -O--max-parallel=1
-   dh_installinit -O--max-parallel=1
-   dh_systemd_start -O--max-parallel=1
-   dh_perl -O--max-parallel=1
-   dh_link -O--max-parallel=1
-   dh_strip_nondeterminism -O--max-parallel=1
-   dh_compress -O--max-parallel=1
-   dh_fixperms -O--max-parallel=1
-   dh_missing -O--max-parallel=1
-   dh_strip -O--max-parallel=1
-   dh_makeshlibs -O--max-parallel=1
-   dh_shlibdeps -O--max-parallel=1
-   dh_installdeb -O--max-parallel=1
-   dh_gencontrol -O--max-parallel=1
-   dh_md5sums -O--max-parallel=1
-   dh_builddeb -O--max-parallel=1
+...
 dpkg-deb: building package 'mnvcli' in '../mnvcli_1.0.13.1061-1_amd64.deb'.
 dpkg-deb: building package 'mnvcli-dbgsym' in '../mnvcli-dbgsym_1.0.13.1061-1_amd64.deb'.
 make[1]: Leaving directory '/home/hcartiaux/debian-package-mnvcli'
