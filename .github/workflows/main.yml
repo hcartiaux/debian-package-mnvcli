@@ -1,0 +1,79 @@
+# This is a basic workflow that is manually triggered
+name: Build mnvcli debian package
+
+# Runs the action when it is triggered manually
+on: workflow_dispatch
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        outputs:
+          package_file_name: ${{ steps.build.outputs.package_file_name }}
+          package_version: ${{ steps.build.outputs.package_version }}
+
+        steps:
+        - name: Check out the repository to the runner
+          uses: actions/checkout@v4
+        - name: Install dependencies
+          run: sudo apt-get update ; sudo apt-get install -y build-essential devscripts debhelper
+        - name: Build !
+          id: build
+          run: |
+            set -x
+            make deb
+            mv ../mnvcli_*.deb /tmp
+            cd /tmp
+            echo "package_file_name=$(ls mnvcli_*.deb)" >> $GITHUB_OUTPUT
+            echo "package_file_name=$(ls mnvcli_*.deb)" >> $GITHUB_ENV
+            echo "package_version=$(ls mnvcli_*.deb | sed -E 's/^mnvcli_([^_]*)_.*$/\1/')" >> $GITHUB_OUTPUT
+            echo "package_version=$(ls mnvcli_*.deb | sed -E 's/^mnvcli_([^_]*)_.*$/\1/')" >> $GITHUB_ENV
+        - name: Generate the checksum file
+          run: |
+            cd /tmp
+            sha256sum ${{ env.package_file_name }} > /tmp/${{ env.package_file_name }}.sha256sum
+        - uses: actions/upload-artifact@v4
+          with:
+              name: ${{ env.package_file_name }}
+              path: /tmp/${{ env.package_file_name }}
+        - uses: actions/upload-artifact@v4
+          with:
+              name: ${{ env.package_file_name }}.sha256sum
+              path: /tmp/${{ env.package_file_name }}.sha256sum
+
+    release:
+        needs: build
+        runs-on: ubuntu-latest
+        permissions: write-all
+        environment:
+          name: release
+
+        steps:
+        - name: Check out the repository to the runner
+          uses: actions/checkout@v4
+        - name: Generate tag name
+          run: echo "tag=${{ needs.build.outputs.package_version }}-$(date +'%Y-%m-%d-%H-%M')" >> "$GITHUB_ENV"
+        - uses: actions/download-artifact@v4
+          with:
+            name: ${{ needs.build.outputs.package_file_name }}
+            path: .
+        - uses: actions/download-artifact@v4
+          with:
+            name: ${{ needs.build.outputs.package_file_name }}.sha256sum
+            path: .
+        - name: Verify the checksum of the Debian package
+          run: |
+            sha256sum -c ${{ needs.build.outputs.package_file_name }}.sha256sum
+        - name: Create a new release
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          run: |
+            gh release create "${tag}" \
+                --repo="$GITHUB_REPOSITORY" \
+                --title="${tag}" \
+                --generate-notes
+        - name: Upload the package and checksum files
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          run: |
+            gh release upload "${tag}" ${{ needs.build.outputs.package_file_name }}
+            gh release upload "${tag}" ${{ needs.build.outputs.package_file_name }}.sha256sum
