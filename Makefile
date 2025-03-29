@@ -17,7 +17,7 @@ download:
 
 unzip:
 	# Unzip and move files
-	unzip -f *.zip
+	unzip *.zip
 	rm -f *.zip
 	mkdir -p debian/upstream
 	mv -f *.txt debian/upstream/README
